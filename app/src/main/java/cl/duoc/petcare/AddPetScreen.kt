@@ -22,6 +22,8 @@ fun AddPetScreen(
     var name by rememberSaveable { mutableStateOf("") }
     var species by rememberSaveable { mutableStateOf("") }
     var age by rememberSaveable { mutableStateOf("") }
+    var medicalInfo by rememberSaveable { mutableStateOf("") }
+    var behaviorNotes by rememberSaveable { mutableStateOf("") }
 
     var nameError by remember { mutableStateOf<String?>(null) }
 
@@ -31,8 +33,15 @@ fun AddPetScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(title = { Text("Nueva mascota de $ownerName") })
+            TopAppBar(
+                title = { Text("Nueva mascota de $ownerName") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
         }
     ) { inner ->
         Column(
@@ -70,6 +79,24 @@ fun AddPetScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = medicalInfo,
+                onValueChange = { medicalInfo = it },
+                label = { Text("Información médica (vacunas, alergias)") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = behaviorNotes,
+                onValueChange = { behaviorNotes = it },
+                label = { Text("Comportamiento / notas") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
             Spacer(Modifier.height(20.dp))
 
             Button(
@@ -82,13 +109,19 @@ fun AddPetScreen(
                                 owner = ownerName,
                                 name = name,
                                 species = species,
-                                age = age
+                                age = age,
+                                medicalInfo = medicalInfo,
+                                behavior = behaviorNotes
                             )
                         )
                         onPetSaved()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary
+                )
             ) {
                 Text("Guardar mascota")
             }

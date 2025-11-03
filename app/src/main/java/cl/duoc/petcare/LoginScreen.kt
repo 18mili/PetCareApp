@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -14,6 +17,9 @@ fun LoginScreen(
     onLoginSuccess: (String) -> Unit,
     onGoToRegister: () -> Unit
 ) {
+    val context = LocalContext.current
+    val repo = remember { UserLocalDataStore(context) }
+    val scope = rememberCoroutineScope()
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
 
@@ -67,9 +73,20 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                if (validate()) {
-                    // por ahora dejamos pasar con cualquier usuario válido
-                    onLoginSuccess("Milagros")
+                if (!validate()) return@Button
+
+                scope.launch {
+                    val user = repo.getUserByEmail(email)
+                    if (user == null) {
+                        emailError = "No existe una cuenta con ese correo"
+                        return@launch
+                    }
+                    if (user.password != password) {
+                        passError = "Contraseña incorrecta"
+                        return@launch
+                    }
+
+                    onLoginSuccess(user.name)
                 }
             },
             modifier = Modifier.fillMaxWidth()

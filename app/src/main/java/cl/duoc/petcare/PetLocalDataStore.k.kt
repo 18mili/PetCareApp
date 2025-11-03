@@ -42,11 +42,15 @@ class PetLocalDataStore(private val context: Context) {
                 val name = parts.getOrNull(1) ?: ""
                 val species = parts.getOrNull(2) ?: ""
                 val age = parts.getOrNull(3) ?: ""
+                val medical = parts.getOrNull(4) ?: ""
+                val behavior = parts.getOrNull(5) ?: ""
                 Pet(
                     owner = owner,
                     name = name,
                     species = species,
-                    age = age
+                    age = age,
+                    medicalInfo = medical,
+                    behavior = behavior
                 )
             }
     }
@@ -54,7 +58,8 @@ class PetLocalDataStore(private val context: Context) {
     // 3) guardar lista -> string
     private suspend fun saveAll(pets: List<Pet>) {
         val raw = pets.joinToString(separator = ";") { pet ->
-            "${pet.owner}|${pet.name}|${pet.species}|${pet.age}"
+            // guardamos formato extendido owner|name|species|age|medical|behavior
+            "${pet.owner}|${pet.name}|${pet.species}|${pet.age}|${pet.medicalInfo}|${pet.behavior}"
         }
         context.petPrefs.edit { prefs ->
             prefs[PETS_RAW] = raw
@@ -70,6 +75,15 @@ class PetLocalDataStore(private val context: Context) {
     // 5) obtener solo las mascotas de un dueño
     suspend fun getPetsByOwner(owner: String): List<Pet> {
         return getAllPets().filter { it.owner.equals(owner, ignoreCase = true) }
+    }
+
+    // actualiza el nombre del dueño en todas las mascotas (cuando el usuario cambia su nombre)
+    suspend fun updateOwnerName(oldName: String, newName: String) {
+        val current = getAllPets()
+        val updated = current.map { pet ->
+            if (pet.owner.equals(oldName, ignoreCase = true)) pet.copy(owner = newName) else pet
+        }
+        saveAll(updated)
     }
 
     // 6) (opcional) borrar todo

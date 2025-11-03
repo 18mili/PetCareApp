@@ -4,6 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -14,6 +18,10 @@ fun RegisterScreen(
     onRegisterSuccess: (String) -> Unit,
     onBackToLogin: () -> Unit
 ) {
+    val context = LocalContext.current
+    val repo = remember { UserLocalDataStore(context) }
+    val scope = rememberCoroutineScope()
+
     var name by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -89,7 +97,18 @@ fun RegisterScreen(
 
         Button(
             onClick = {
-                if (validate()) {
+                if (!validate()) return@Button
+
+                scope.launch {
+                    val existing = repo.getUserByEmail(email)
+                    if (existing != null) {
+                        // email already registered
+                        emailError = "Correo ya registrado"
+                        return@launch
+                    }
+
+                    // guardar usuario y navegar (sin imagen por ahora)
+                    repo.addUser(User(name = name, email = email, password = password, profileImage = ""))
                     onRegisterSuccess(name)
                 }
             },

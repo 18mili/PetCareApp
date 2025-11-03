@@ -65,7 +65,7 @@ fun PetCareApp() {
                     )
                 }
 
-                // HOME (lista de mascotas)
+                // HOME (contenedor con navegación inferior)
                 composable(
                     route = "home/{owner}",
                     arguments = listOf(
@@ -73,16 +73,12 @@ fun PetCareApp() {
                     )
                 ) { backStackEntry ->
                     val owner = backStackEntry.arguments?.getString("owner") ?: "Tutor"
-                    PetListScreen(
+                    HomeShell(
                         ownerName = owner,
-                        onAddPet = {
-                            rootNavController.navigate("addPet/$owner")
-                        },
-                        onLogout = {
-                            rootNavController.navigate("login") {
-                                popUpTo(0) { inclusive = true }
-                            }
-                        }
+                        onAddPet = { rootNavController.navigate("addPet/$owner") },
+                        onLogout = { rootNavController.navigate("login") { popUpTo(0) { inclusive = true } } },
+                        onNavigateToAddPet = { rootNavController.navigate("addPet/$owner") },
+                        onNavigateToScan = { rootNavController.navigate("scanFood/$owner") }
                     )
                 }
 
@@ -98,6 +94,22 @@ fun PetCareApp() {
                         ownerName = owner,
                         onPetSaved = {
                             // volver a la lista
+                            rootNavController.popBackStack()
+                        }
+                    )
+                }
+
+                // SCAN FOOD
+                composable(
+                    route = "scanFood/{owner}",
+                    arguments = listOf(
+                        navArgument("owner") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val owner = backStackEntry.arguments?.getString("owner") ?: ""
+                    ScanFoodScreen(
+                        ownerName = owner,
+                        onFoodSaved = {
                             rootNavController.popBackStack()
                         }
                     )

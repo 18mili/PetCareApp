@@ -60,4 +60,16 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    // CameraX
+    implementation("androidx.camera:camera-core:1.2.3")
+    implementation("androidx.camera:camera-camera2:1.2.3")
+    implementation("androidx.camera:camera-lifecycle:1.2.3")
+    implementation("androidx.camera:camera-view:1.2.3")
+
+    // ML Kit - on-device text recognition (ajustada versión para resolver resolución)
+    implementation("com.google.mlkit:text-recognition:16.0.0")
+    // Play Services Location para obtener la ubicación
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    // Coil para cargar imágenes en Compose
+    implementation("io.coil-kt:coil-compose:2.4.0")
 }
